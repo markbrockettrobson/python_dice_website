@@ -1,0 +1,13 @@
+FROM python:3.7-slim
+RUN pip install flask
+
+RUN mkdir /usr/pydiceweb
+WORKDIR /usr/pydiceweb
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+
+COPY python_dice_website ./python_dice_website
+
+CMD python python_dice_website/src/app.py

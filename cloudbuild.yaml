@@ -1,0 +1,22 @@
+steps:
+- name: 'python:3.7-slim'
+  id: Test
+  args:
+  - -c
+  - 'pip install -r requirements.txt && python -m pytest --black --isort --pylint --cov python_dice'
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: Build
+  args:
+  - 'build'
+  - '-t'
+  - 'gcr.io/$PROJECT_ID/hello-cloudbuild:$SHORT_SHA'
+  - '-f'
+  - ''
+  - '.'
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: Push
+  args:
+  - 'push'
+  - 'gcr.io/$PROJECT_ID/hello-cloudbuild:$SHORT_SHA'
