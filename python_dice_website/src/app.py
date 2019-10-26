@@ -3,6 +3,10 @@ import os
 import flask
 
 
+def app():
+    PythonDiceWebApp().run()
+
+
 class PythonDiceWebApp:
     def __init__(
         self,
