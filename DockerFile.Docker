@@ -5,9 +5,14 @@ RUN mkdir /usr/pydiceweb
 WORKDIR /usr/pydiceweb
 
 COPY requirements.txt ./
+COPY .coveragerc ./
+COPY pylintrc ./
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 
 COPY python_dice_website ./python_dice_website
+
+RUN python -m pytest --black --isort --pylint --cov python_dice_website
 
 CMD python python_dice_website/src/app.py
