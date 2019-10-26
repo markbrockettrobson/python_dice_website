@@ -1,8 +1,15 @@
+import os
+
 import flask
 
 
 class PythonDiceWebApp:
-    def __init__(self, host: str = "localhost", debug: bool = False, port=5000):
+    def __init__(
+        self,
+        host: str = "0.0.0.0",
+        debug: bool = False,
+        port: int = int(os.environ.get("PORT", 8080)),
+    ):
         self._app = flask.Flask(__name__)
         self._debug = debug
         self._host = host
@@ -18,4 +25,6 @@ class PythonDiceWebApp:
 
 
 if __name__ == "__main__":
-    PythonDiceWebApp(host="0.0.0.0", debug=True, port=5000).run()
+    PythonDiceWebApp(
+        host="localhost", debug=True, port=int(os.environ.get("PORT", 8080))
+    ).run()
