@@ -20,10 +20,12 @@ steps:
     - 'beta'
     - 'run'
     - 'deploy'
-    - 'pythondicewebsite'
+    - 'gcr.io/$PROJECT_ID/pythondicewebsite'
     - '--image'
     - 'gcr.io/$PROJECT_ID/python_dice_website:$SHORT_SHA'
     - '--region'
     - 'us-central1'
+    - '--platform'
+    - 'managed'
 images:
 - gcr.io/$PROJECT_ID/python_dice_website:$SHORT_SHA
