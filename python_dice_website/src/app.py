@@ -3,7 +3,8 @@ import os
 import flask
 
 
-def app(_, __):
+# pylint: disable=unused-variable
+def app(environ, start_response):
     PythonDiceWebApp().run()
 
 
