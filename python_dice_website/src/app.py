@@ -3,7 +3,7 @@ import os
 import flask
 
 
-def app():
+def app(_, __):
     PythonDiceWebApp().run()
 
 
