@@ -18,7 +18,7 @@ class PythonDiceWebApp:
         # pylint: disable=unused-variable
         @self._app.route("/")
         def hello_world():
-            return "Hello World"
+            return "Hello World v2"
 
     def get_app(self) -> flask.Flask:
         return self._app

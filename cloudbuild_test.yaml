@@ -8,9 +8,3 @@ steps:
   - '-f'
   - 'DockerFile.Docker'
   - '.'
-
-- name: 'gcr.io/cloud-builders/docker'
-  id: Push
-  args:
-  - 'push'
-  - 'gcr.io/$PROJECT_ID/python_dice_website:$SHORT_SHA'
