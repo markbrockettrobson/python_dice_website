@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+   <body>
+      <table border = 1>
+         {% for key, value in help_table.items() %}
+            <tr>
+               <th> {{ key }} </th>
+               <td> {{ value[1] }} </td>
+               <td> {{ value[0] }} </td>
+            </tr>
+         {% endfor %}
+      </table>
+   </body>
+</html>
