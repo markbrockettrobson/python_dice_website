@@ -3,11 +3,6 @@ import os
 import flask
 
 
-# pylint: disable=unused-variable
-def app(environ, start_response):
-    PythonDiceWebApp().run()
-
-
 class PythonDiceWebApp:
     def __init__(
         self,
@@ -25,11 +20,14 @@ class PythonDiceWebApp:
         def hello_world():
             return "Hello World"
 
-    def run(self):
+    def get_app(self) -> flask.Flask:
+        return self._app
+
+    def run(self) -> None:
         self._app.run(host=self._host, debug=self._debug, port=self._port)
 
 
+APP = PythonDiceWebApp().get_app()
+
 if __name__ == "__main__":
-    PythonDiceWebApp(
-        host="localhost", debug=True, port=int(os.environ.get("PORT", 8080))
-    ).run()
+    PythonDiceWebApp().run()
