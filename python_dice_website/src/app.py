@@ -2,6 +2,9 @@ import os
 
 import flask
 
+import python_dice_website.src.api.api_list as api_list
+import python_dice_website.src.api.help_api as help_api
+
 
 class PythonDiceWebApp:
     def __init__(
@@ -15,10 +18,9 @@ class PythonDiceWebApp:
         self._host = host
         self._port = port
 
-        # pylint: disable=unused-variable
-        @self._app.route("/")
-        def hello_world():
-            return "Hello World v2"
+        help_api.HelpApi.add_to_app(self._app)
+        for api in api_list.API_LIST:
+            api.add_to_app(self._app)
 
     def get_app(self) -> flask.Flask:
         return self._app
@@ -30,4 +32,4 @@ class PythonDiceWebApp:
 APP = PythonDiceWebApp().get_app()
 
 if __name__ == "__main__":
-    PythonDiceWebApp().run()
+    PythonDiceWebApp(host="localhost", debug=True, port=5000).run()
