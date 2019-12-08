@@ -11,14 +11,13 @@ class RollApi(i_api_type.IApi):
     )
     _ROUTE = "/roll"
 
-    # pylint: disable=unused-variable
+    # pylint: disable=unused-variable, broad-except
     @staticmethod
     def add_to_app(flask_app: flask.Flask) -> None:
         @flask_app.route(RollApi._ROUTE, methods=["POST"])
-        def roll():
+        def roll_api():
             interpreter = python_dice.PythonDiceInterpreter()
             request_json = flask.request.get_json()
-            print(f"request_json {str(request_json)}")
             if request_json and "program" in request_json:
                 program = request_json["program"]
             else:
@@ -26,9 +25,8 @@ class RollApi(i_api_type.IApi):
             split_program = program.split("\n")
             try:
                 return str(interpreter.roll(split_program)["stdout"])
-            except Exception as e:
-                print(str(e))
-                return f"{str(e)}"
+            except Exception as exception:
+                return f"{str(exception)}"
 
     @staticmethod
     def get_name() -> str:
