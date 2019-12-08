@@ -13,7 +13,7 @@ class HelpApi(i_api_type.IApi):
     @staticmethod
     def add_to_app(flask_app: flask.Flask) -> None:
         @flask_app.route(HelpApi._ROUTE)
-        def help():
+        def help_api():
             help_table = {
                 api.get_name(): (api.get_help_text(), api.get_route())
                 for api in api_list.API_LIST
