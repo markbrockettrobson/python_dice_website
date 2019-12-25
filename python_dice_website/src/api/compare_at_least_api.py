@@ -13,8 +13,7 @@ class CompareAtLeastApi(i_api_type.IApi):
         "\n"
         "Creates a probability distribution of two python dice program and returns the image result or passer error\n"
         "Post request:\n"
-        "   The program to be passed as json field in the body of a post request\n"
-        "   eg {"
+        "  eg {"
         '       program_one: "2d6 + 2", '
         '       program_one_name: "hammer",'
         '       program_two: "2d10 - 2", '
@@ -23,7 +22,7 @@ class CompareAtLeastApi(i_api_type.IApi):
         "   note names are optional"
         "Get request:\n"
         "   The program to be passed as a URL parameter\n"
-        "   eg compareatleast?program_one=2d6%20%2B%202&program_two=2d10%20-%202&program_one_name=hammer&program_two_name=bow\n"
+        "   eg ?program_one=2d6%20%2B%202&program_two=2d10%20-%202&program_one_name=hammer&program_two_name=bow\n"
         '       %20 = " "\n'
         '       %2B = "+"\n'
         "   note names are optional"

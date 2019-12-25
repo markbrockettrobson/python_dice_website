@@ -22,8 +22,8 @@ class CompareApi(i_api_type.IApi):
         "   }\n"
         "   note names are optional"
         "Get request:\n"
-        "   The program to be passed as a URL parameter\n"
-        "   eg compare?program_one=2d6%20%2B%202&program_two=2d10%20-%202&program_one_name=hammer&program_two_name=bow\n"
+        "   The program to be passed as a URL parameter\n ="
+        "   eg ?program_one=2d6%20%2B%202&program_two=2d10%20-%202&program_one_name=hammer&program_two_name=bow\n"
         '       %20 = " "\n'
         '       %2B = "+"\n'
         "   note names are optional"
