@@ -1,6 +1,4 @@
 import io
-import os
-import pathlib
 import typing
 
 import flask
@@ -13,7 +11,7 @@ class HistogramApi(i_api_type.IApi):
     _HELP_NAME = "Histogram"
     _HElP_TEXT = (
         "\n"
-        "Creates a probability distribution a python dice program and returns the int image result or passer error\n"
+        "Creates a probability distribution a python dice program and returns the image result or passer error\n"
         "Post request:\n"
         "   The program to be passed as json field in the body of a post request\n"
         '   eg {program: "2d6 + 2"}\n'
@@ -30,8 +28,6 @@ class HistogramApi(i_api_type.IApi):
     def add_to_app(flask_app: flask.Flask) -> None:
         @flask_app.route(HistogramApi._ROUTE, methods=["POST", "GET"])
         def histogram_api():
-            if not pathlib.Path("temp_images").exists():
-                os.mkdir("temp_images")
             if flask.request.method == "POST":
                 return histogram_api_post()
             return histogram_api_get()
