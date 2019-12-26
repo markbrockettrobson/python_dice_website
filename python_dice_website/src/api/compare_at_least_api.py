@@ -98,7 +98,7 @@ class CompareAtLeastApi(i_api_type.IApi):
                 program_two_distribution = interpreter.get_probability_distributions(
                     split_program_two
                 )["stdout"]
-                image = program_one_distribution.get_compare_at_least_histogram(
+                image = program_one_distribution.get_compare_at_least(
                     program_two_distribution, name_one, name_two
                 )
                 file_pointer = io.BytesIO()
