@@ -8,7 +8,7 @@ import python_dice_website.interface.i_api_type as i_api_type
 
 
 class CompareAtMostApi(i_api_type.IApi):
-    _HELP_NAME = "compare at least"
+    _HELP_NAME = "compare at most"
     _HElP_TEXT = (
         "\n"
         "Creates a probability distribution of two python dice program and returns the image result or passer error\n"
@@ -98,7 +98,7 @@ class CompareAtMostApi(i_api_type.IApi):
                 program_two_distribution = interpreter.get_probability_distributions(
                     split_program_two
                 )["stdout"]
-                image = program_one_distribution.get_compare_at_most_histogram(
+                image = program_one_distribution.get_compare_at_most(
                     program_two_distribution, name_one, name_two
                 )
                 file_pointer = io.BytesIO()
