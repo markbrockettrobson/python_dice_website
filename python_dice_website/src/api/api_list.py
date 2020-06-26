@@ -11,6 +11,7 @@ import python_dice_website.src.api.compare_histogram_api as compare_histogram_ap
 import python_dice_website.src.api.histogram_api as histogram_api
 import python_dice_website.src.api.privacy_policy_api as privacy_policy_api
 import python_dice_website.src.api.roll_api as roll_api
+import python_dice_website.src.api.slack_roll_api as slack_roll_api
 
 API_LIST: typing.List[i_api_type.IApi] = [
     roll_api.RollApi(),
@@ -23,4 +24,5 @@ API_LIST: typing.List[i_api_type.IApi] = [
     compare_at_least_api.CompareAtLeastApi(),
     compare_at_most_api.CompareAtMostApi(),
     privacy_policy_api.PrivacyApi(),
+    slack_roll_api.SlackRollApi(),
 ]
