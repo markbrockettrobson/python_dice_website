@@ -42,8 +42,8 @@ class TestRollAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             data,
-            '{"response_type":"ephemeral","text":"Ran into a $end ($end)' +
-            ' where it wasn\'t expected, at position None."}\n',
+            '{"response_type":"ephemeral","text":"Ran into a $end ($end)'
+            + " where it wasn't expected, at position None.\"}\n",
         )
 
     def test_error_two_post(self):
@@ -58,6 +58,6 @@ class TestRollAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             data,
-            '{"response_type":"ephemeral","text":"Ran into a DICE (d0)' +
-            ' where it wasn\'t expected, at position SourcePosition(idx=5, lineno=1, colno=6)."}\n',
+            '{"response_type":"ephemeral","text":"Ran into a DICE (d0)'
+            + " where it wasn't expected, at position SourcePosition(idx=5, lineno=1, colno=6).\"}\n",
         )
