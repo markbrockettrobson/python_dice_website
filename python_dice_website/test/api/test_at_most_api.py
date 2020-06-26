@@ -73,19 +73,25 @@ class TestAtMostAPI(unittest.TestCase):
     def disable_test_error_two_post(self):
         response = app.APP.test_client().post(
             "/atmost",
-            data=flask.json.dumps({"program": "3d3d0"}),
+            data=flask.json.dumps({"program": "3d3d1d0"}),
             content_type="application/json",
         )
 
         data = response.get_data(as_text=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data, "(None, SourcePosition(idx=3, lineno=-1, colno=-1))")
+        self.assertEqual(
+            data,
+            "Ran into a DICE (d0) where it wasn't expected, at position SourcePosition(idx=5, lineno=1, colno=6).",
+        )
 
     def disable_test_error_two_get(self):
-        response = app.APP.test_client().get("/atmost?program=3d3d0")
+        response = app.APP.test_client().get("/atmost?program=3d3d1d0")
 
         data = response.get_data(as_text=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data, "(None, SourcePosition(idx=3, lineno=-1, colno=-1))")
+        self.assertEqual(
+            data,
+            "Ran into a DICE (d0) where it wasn't expected, at position SourcePosition(idx=5, lineno=1, colno=6).",
+        )
