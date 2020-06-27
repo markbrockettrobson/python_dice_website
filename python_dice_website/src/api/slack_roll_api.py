@@ -25,7 +25,7 @@ class SlackRollApi(i_api_type.IApi):
         def slack_roll_api():
             local_logger.debug("request method %s", flask.request.method)
             interpreter = python_dice.PythonDiceInterpreter()
-            program = flask.request.form.get('text', None)
+            program = flask.request.form.get("text", None)
 
             local_logger.debug("request text is %s", program)
             if program is None:
@@ -35,6 +35,7 @@ class SlackRollApi(i_api_type.IApi):
             split_program = program.split("\n")
             try:
                 payload = {
+                    "response_type": "in_channel",
                     "blocks": [
                         {
                             "type": "section",
@@ -47,7 +48,7 @@ class SlackRollApi(i_api_type.IApi):
                                 "text": str(interpreter.roll(split_program)["stdout"]),
                             },
                         },
-                    ]
+                    ],
                 }
                 local_logger.debug("return %s", payload)
                 return flask.jsonify(payload)
