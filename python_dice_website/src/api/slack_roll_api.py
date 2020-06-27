@@ -2,6 +2,7 @@ import flask
 import python_dice
 
 import python_dice_website.interface.i_api_type as i_api_type
+import python_dice_website.src.global_logger as global_logger
 
 
 class SlackRollApi(i_api_type.IApi):
@@ -18,7 +19,7 @@ class SlackRollApi(i_api_type.IApi):
     # pylint: disable=unused-variable, broad-except
     @staticmethod
     def add_to_app(flask_app: flask.Flask) -> None:
-        local_logger = flask_app.logger.getChild(SlackRollApi.__name__)
+        local_logger = global_logger.ROOT_LOGGER.getChild(SlackRollApi.__name__)
 
         @flask_app.route(SlackRollApi._ROUTE, methods=["POST"])
         def slack_roll_api():

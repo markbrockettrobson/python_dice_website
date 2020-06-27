@@ -11,8 +11,6 @@ class PrivacyApi(i_api_type.IApi):
     # pylint: disable=unused-variable, broad-except
     @staticmethod
     def add_to_app(flask_app: flask.Flask) -> None:
-        local_logger = flask_app.logger.getChild(PrivacyApi.__name__)
-
         @flask_app.route(PrivacyApi._ROUTE, methods=["GET"])
         def privacy_api():
             return flask.render_template("PrivacyPolicy.html")
