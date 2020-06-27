@@ -2,6 +2,7 @@ import flask
 import python_dice
 
 import python_dice_website.interface.i_api_type as i_api_type
+import python_dice_website.src.global_logger as global_logger
 
 
 class RollApi(i_api_type.IApi):
@@ -23,7 +24,7 @@ class RollApi(i_api_type.IApi):
     # pylint: disable=unused-variable, broad-except
     @staticmethod
     def add_to_app(flask_app: flask.Flask) -> None:
-        local_logger = flask_app.logger.getChild(RollApi.__name__)
+        local_logger = global_logger.ROOT_LOGGER.getChild(RollApi.__name__)
 
         @flask_app.route(RollApi._ROUTE, methods=["POST", "GET"])
         def roll_api():

@@ -12,8 +12,6 @@ class HelpApi(i_api_type.IApi):
     # pylint: disable=unused-variable
     @staticmethod
     def add_to_app(flask_app: flask.Flask) -> None:
-        local_logger = flask_app.logger.getChild(HelpApi.__name__)
-
         @flask_app.route(HelpApi._ROUTE)
         def help_api():
             help_table = {

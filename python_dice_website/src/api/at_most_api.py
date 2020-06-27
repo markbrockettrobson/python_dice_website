@@ -5,6 +5,7 @@ import flask
 import python_dice
 
 import python_dice_website.interface.i_api_type as i_api_type
+import python_dice_website.src.global_logger as global_logger
 
 
 class AtMostApi(i_api_type.IApi):
@@ -26,7 +27,7 @@ class AtMostApi(i_api_type.IApi):
     # pylint: disable=unused-variable, broad-except
     @staticmethod
     def add_to_app(flask_app: flask.Flask) -> None:
-        local_logger = flask_app.logger.getChild(AtMostApi.__name__)
+        local_logger = global_logger.ROOT_LOGGER.getChild(AtMostApi.__name__)
 
         @flask_app.route(AtMostApi._ROUTE, methods=["POST", "GET"])
         def at_most_api():
@@ -37,7 +38,7 @@ class AtMostApi(i_api_type.IApi):
 
         def at_most_api_post():
             request_json = flask.request.get_json()
-            local_logger.debug("request json %", request_json)
+            local_logger.debug("request json %s", request_json)
             if request_json and "program" in request_json:
                 program = request_json["program"]
             else:

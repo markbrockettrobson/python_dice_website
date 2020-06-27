@@ -5,6 +5,7 @@ import flask
 import python_dice
 
 import python_dice_website.interface.i_api_type as i_api_type
+import python_dice_website.src.global_logger as global_logger
 
 
 class CompareAtLeastApi(i_api_type.IApi):
@@ -32,7 +33,7 @@ class CompareAtLeastApi(i_api_type.IApi):
     # pylint: disable=unused-variable, broad-except
     @staticmethod
     def add_to_app(flask_app: flask.Flask) -> None:
-        local_logger = flask_app.logger.getChild(CompareAtLeastApi.__name__)
+        local_logger = global_logger.ROOT_LOGGER.getChild(CompareAtLeastApi.__name__)
 
         @flask_app.route(CompareAtLeastApi._ROUTE, methods=["POST", "GET"])
         def compare_at_least_api():
@@ -43,7 +44,7 @@ class CompareAtLeastApi(i_api_type.IApi):
 
         def compare_at_least_api_post():
             request_json = flask.request.get_json()
-            local_logger.debug("request json %", request_json)
+            local_logger.debug("request json %s", request_json)
             if (
                 request_json
                 and "program_one" in request_json

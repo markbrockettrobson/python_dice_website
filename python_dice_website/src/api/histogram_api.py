@@ -5,6 +5,7 @@ import flask
 import python_dice
 
 import python_dice_website.interface.i_api_type as i_api_type
+import python_dice_website.src.global_logger as global_logger
 
 
 class HistogramApi(i_api_type.IApi):
@@ -26,7 +27,7 @@ class HistogramApi(i_api_type.IApi):
     # pylint: disable=unused-variable, broad-except
     @staticmethod
     def add_to_app(flask_app: flask.Flask) -> None:
-        local_logger = flask_app.logger.getChild(HistogramApi.__name__)
+        local_logger = global_logger.ROOT_LOGGER.getChild(HistogramApi.__name__)
 
         @flask_app.route(HistogramApi._ROUTE, methods=["POST", "GET"])
         def histogram_api():
@@ -37,7 +38,7 @@ class HistogramApi(i_api_type.IApi):
 
         def histogram_api_post():
             request_json = flask.request.get_json()
-            local_logger.debug("request json %", request_json)
+            local_logger.debug("request json %s", request_json)
             if request_json and "program" in request_json:
                 program = request_json["program"]
             else:

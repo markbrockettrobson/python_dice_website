@@ -5,6 +5,7 @@ import flask
 import python_dice
 
 import python_dice_website.interface.i_api_type as i_api_type
+import python_dice_website.src.global_logger as global_logger
 
 
 class AtLeastApi(i_api_type.IApi):
@@ -26,7 +27,7 @@ class AtLeastApi(i_api_type.IApi):
     # pylint: disable=unused-variable, broad-except
     @staticmethod
     def add_to_app(flask_app: flask.Flask) -> None:
-        local_logger = flask_app.logger.getChild(AtLeastApi.__name__)
+        local_logger = global_logger.ROOT_LOGGER.getChild(AtLeastApi.__name__)
 
         @flask_app.route(AtLeastApi._ROUTE, methods=["POST", "GET"])
         def at_least_api():
