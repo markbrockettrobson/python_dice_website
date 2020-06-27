@@ -1,17 +1,11 @@
 import unittest
 
-import flask
-
 import python_dice_website.src.app as app
 
 
 class TestRollAPI(unittest.TestCase):
     def test_add_post(self):
-        response = app.APP.test_client().post(
-            "/slackroll",
-            data=flask.json.dumps({"text": "1 + 3"}),
-            content_type="application/json",
-        )
+        response = app.APP.test_client().post("/slackroll", data=dict(text="1 + 3"))
 
         data = response.get_data(as_text=True)
 
@@ -19,14 +13,12 @@ class TestRollAPI(unittest.TestCase):
         self.assertEqual(
             data,
             '{"blocks":[{"text":{"text":"1 + 3","type":"mrkdwn"},'
-            '"type":"section"},{"text":{"text":"4","type":"mrkdwn"},"type":"section"}]}\n',
+            '"type":"section"},{"text":{"text":"4","type":"mrkdwn"},"type":"section"}],"response_type":"in_channel"}\n',
         )
 
     def test_sub_post(self):
         response = app.APP.test_client().post(
-            "/slackroll",
-            data=flask.json.dumps({"text": "ABS(1 - 3)"}),
-            content_type="application/json",
+            "/slackroll", data=dict(text="ABS(1 - 3)")
         )
 
         data = response.get_data(as_text=True)
@@ -35,14 +27,12 @@ class TestRollAPI(unittest.TestCase):
         self.assertEqual(
             data,
             '{"blocks":[{"text":{"text":"ABS(1 - 3)","type":"mrkdwn"},'
-            '"type":"section"},{"text":{"text":"2","type":"mrkdwn"},"type":"section"}]}\n',
+            '"type":"section"},{"text":{"text":"2","type":"mrkdwn"},"type":"section"}],"response_type":"in_channel"}\n',
         )
 
     def test_error_post(self):
         response = app.APP.test_client().post(
-            "/slackroll",
-            data=flask.json.dumps({"text": "ABS(1 - 3d30"}),
-            content_type="application/json",
+            "/slackroll", data=dict(text="ABS(1 - 3d30")
         )
 
         data = response.get_data(as_text=True)
@@ -55,11 +45,7 @@ class TestRollAPI(unittest.TestCase):
         )
 
     def test_error_two_post(self):
-        response = app.APP.test_client().post(
-            "/slackroll",
-            data=flask.json.dumps({"text": "3d3d1d0"}),
-            content_type="application/json",
-        )
+        response = app.APP.test_client().post("/slackroll", data=dict(text="3d3d1d0"))
 
         data = response.get_data(as_text=True)
 

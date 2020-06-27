@@ -25,17 +25,17 @@ class SlackRollApi(i_api_type.IApi):
         def slack_roll_api():
             local_logger.debug("request method %s", flask.request.method)
             interpreter = python_dice.PythonDiceInterpreter()
-            request_json = flask.request.get_json()
-            local_logger.debug("request json %s", request_json)
-            if request_json and "text" in request_json:
-                program = request_json["text"]
-            else:
+            program = flask.request.form.get("text", None)
+
+            local_logger.debug("request text is %s", program)
+            if program is None:
                 payload = {"response_type": "ephemeral", "text": "no dice program!"}
                 local_logger.debug("return %s", payload)
                 return flask.jsonify(payload)
             split_program = program.split("\n")
             try:
                 payload = {
+                    "response_type": "in_channel",
                     "blocks": [
                         {
                             "type": "section",
@@ -48,7 +48,7 @@ class SlackRollApi(i_api_type.IApi):
                                 "text": str(interpreter.roll(split_program)["stdout"]),
                             },
                         },
-                    ]
+                    ],
                 }
                 local_logger.debug("return %s", payload)
                 return flask.jsonify(payload)
