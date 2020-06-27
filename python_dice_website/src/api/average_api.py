@@ -23,8 +23,11 @@ class AverageApi(i_api_type.IApi):
     # pylint: disable=unused-variable, broad-except
     @staticmethod
     def add_to_app(flask_app: flask.Flask) -> None:
+        local_logger = flask_app.logger.getChild(AverageApi.__name__)
+
         @flask_app.route(AverageApi._ROUTE, methods=["POST", "GET"])
         def average_api():
+            local_logger.debug("request method %s", flask.request.method)
             if flask.request.method == "POST":
                 return average_api_post()
             return average_api_get()
@@ -32,6 +35,7 @@ class AverageApi(i_api_type.IApi):
         def average_api_post():
             interpreter = python_dice.PythonDiceInterpreter()
             request_json = flask.request.get_json()
+            local_logger.debug("request json %", request_json)
             if request_json and "program" in request_json:
                 program = request_json["program"]
             else:
@@ -45,6 +49,7 @@ class AverageApi(i_api_type.IApi):
         def average_api_get():
             interpreter = python_dice.PythonDiceInterpreter()
             program = flask.request.args.get("program", None)
+            local_logger.debug("program url arg is %s", program)
             if program is None:
                 return f"no url parameter program!"
             split_program = program.split("\n")
