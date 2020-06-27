@@ -16,7 +16,11 @@ class TestRollAPI(unittest.TestCase):
         data = response.get_data(as_text=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data, "4")
+        self.assertEqual(
+            data,
+            '{"blocks":[{"text":{"text":"1 + 3","type":"mrkdwn"},'
+            '"type":"section"},{"text":{"text":"4","type":"mrkdwn"},"type":"section"}]}\n',
+        )
 
     def test_sub_post(self):
         response = app.APP.test_client().post(
@@ -28,7 +32,11 @@ class TestRollAPI(unittest.TestCase):
         data = response.get_data(as_text=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data, "2")
+        self.assertEqual(
+            data,
+            '{"blocks":[{"text":{"text":"ABS(1 - 3)","type":"mrkdwn"},'
+            '"type":"section"},{"text":{"text":"2","type":"mrkdwn"},"type":"section"}]}\n',
+        )
 
     def test_error_post(self):
         response = app.APP.test_client().post(

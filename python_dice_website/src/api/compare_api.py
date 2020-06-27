@@ -33,14 +33,18 @@ class CompareApi(i_api_type.IApi):
     # pylint: disable=unused-variable, broad-except
     @staticmethod
     def add_to_app(flask_app: flask.Flask) -> None:
+        local_logger = flask_app.logger.getChild(CompareApi.__name__)
+
         @flask_app.route(CompareApi._ROUTE, methods=["POST", "GET"])
         def compare_api():
+            local_logger.debug("request method %s", flask.request.method)
             if flask.request.method == "POST":
                 return compare_at_post()
             return compare_api_get()
 
         def compare_at_post():
             request_json = flask.request.get_json()
+            local_logger.debug("request json %", request_json)
             if (
                 request_json
                 and "program_one" in request_json
@@ -66,9 +70,11 @@ class CompareApi(i_api_type.IApi):
 
         def compare_api_get():
             program_one = flask.request.args.get("program_one", None)
+            local_logger.debug("program one url arg is %s", program_one)
             if program_one is None:
                 return f"no url parameter program_one!"
             program_two = flask.request.args.get("program_two", None)
+            local_logger.debug("program two url arg is %s", program_two)
             if program_two is None:
                 return f"no url parameter program_two!"
 

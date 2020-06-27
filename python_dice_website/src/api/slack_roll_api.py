@@ -18,20 +18,42 @@ class SlackRollApi(i_api_type.IApi):
     # pylint: disable=unused-variable, broad-except
     @staticmethod
     def add_to_app(flask_app: flask.Flask) -> None:
+        local_logger = flask_app.logger.getChild(SlackRollApi.__name__)
+
         @flask_app.route(SlackRollApi._ROUTE, methods=["POST"])
         def slack_roll_api():
+            local_logger.debug("request method %s", flask.request.method)
             interpreter = python_dice.PythonDiceInterpreter()
             request_json = flask.request.get_json()
+            local_logger.debug("request json %s", request_json)
             if request_json and "text" in request_json:
                 program = request_json["text"]
             else:
                 payload = {"response_type": "ephemeral", "text": "no dice program!"}
+                local_logger.debug("return %s", payload)
                 return flask.jsonify(payload)
             split_program = program.split("\n")
             try:
-                return str(interpreter.roll(split_program)["stdout"])
+                payload = {
+                    "blocks": [
+                        {
+                            "type": "section",
+                            "text": {"type": "mrkdwn", "text": program},
+                        },
+                        {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": str(interpreter.roll(split_program)["stdout"]),
+                            },
+                        },
+                    ]
+                }
+                local_logger.debug("return %s", payload)
+                return flask.jsonify(payload)
             except Exception as exception:
                 payload = {"response_type": "ephemeral", "text": f"{str(exception)}"}
+                local_logger.debug("return %s", payload)
                 return flask.jsonify(payload)
 
     @staticmethod

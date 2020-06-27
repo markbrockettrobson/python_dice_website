@@ -26,14 +26,18 @@ class HistogramApi(i_api_type.IApi):
     # pylint: disable=unused-variable, broad-except
     @staticmethod
     def add_to_app(flask_app: flask.Flask) -> None:
+        local_logger = flask_app.logger.getChild(HistogramApi.__name__)
+
         @flask_app.route(HistogramApi._ROUTE, methods=["POST", "GET"])
         def histogram_api():
+            local_logger.debug("request method %s", flask.request.method)
             if flask.request.method == "POST":
                 return histogram_api_post()
             return histogram_api_get()
 
         def histogram_api_post():
             request_json = flask.request.get_json()
+            local_logger.debug("request json %", request_json)
             if request_json and "program" in request_json:
                 program = request_json["program"]
             else:

@@ -26,14 +26,18 @@ class AtMostApi(i_api_type.IApi):
     # pylint: disable=unused-variable, broad-except
     @staticmethod
     def add_to_app(flask_app: flask.Flask) -> None:
+        local_logger = flask_app.logger.getChild(AtMostApi.__name__)
+
         @flask_app.route(AtMostApi._ROUTE, methods=["POST", "GET"])
         def at_most_api():
+            local_logger.debug("request method %s", flask.request.method)
             if flask.request.method == "POST":
                 return at_most_api_post()
             return at_most_api_get()
 
         def at_most_api_post():
             request_json = flask.request.get_json()
+            local_logger.debug("request json %", request_json)
             if request_json and "program" in request_json:
                 program = request_json["program"]
             else:
@@ -43,6 +47,7 @@ class AtMostApi(i_api_type.IApi):
 
         def at_most_api_get():
             program = flask.request.args.get("program", None)
+            local_logger.debug("program url arg is %s", program)
             if program is None:
                 return f"no url parameter program!"
             split_program = program.split("\n")
