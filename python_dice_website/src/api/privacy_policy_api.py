@@ -1,28 +1,26 @@
 import flask
+import flask_restplus.api as api
+import flask_restplus.resource as resource
 
 import python_dice_website.interface.i_api_type as i_api_type
+import python_dice_website.src.global_logger as global_logger
 
 
 class PrivacyApi(i_api_type.IApi):
-    _HELP_NAME = "privacy"
-    _HElP_TEXT = "returns the privacy policy of the app"
     _ROUTE = "/privacy"
 
     # pylint: disable=unused-variable, broad-except
-    @staticmethod
-    def add_to_app(flask_app: flask.Flask) -> None:
-        @flask_app.route(PrivacyApi._ROUTE, methods=["GET"])
-        def privacy_api():
-            return flask.render_template("PrivacyPolicy.html")
+    def add_to_app(self, flask_api: api.Api, name_space: api.Namespace) -> None:
+        local_logger = global_logger.ROOT_LOGGER.getChild(PrivacyApi.__name__)
 
-    @staticmethod
-    def get_name() -> str:
-        return PrivacyApi._HELP_NAME
+        # pylint: disable=unused-variable, broad-except
+        @name_space.route(self.route)
+        class Privacy(resource.Resource):
+            @staticmethod
+            def get():
+                local_logger.warning("someone looked at PrivacyPolicy")
+                return flask.render_template("PrivacyPolicy.html")
 
-    @staticmethod
-    def get_help_text() -> str:
-        return PrivacyApi._HElP_TEXT
-
-    @staticmethod
-    def get_route() -> str:
-        return PrivacyApi._ROUTE
+    @property
+    def route(self) -> str:
+        return self._ROUTE

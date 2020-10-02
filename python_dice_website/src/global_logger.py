@@ -9,7 +9,7 @@ def _set_up_root_logger():
     )
     console_handler.setFormatter(formatter)
 
-    root_logger = logging.getLogger()
+    root_logger = logging.getLogger("PDWA")
     root_logger.addHandler(console_handler)
     root_logger.setLevel(logging.DEBUG)
 

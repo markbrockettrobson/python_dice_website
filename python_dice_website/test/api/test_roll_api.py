@@ -1,97 +1,95 @@
 import unittest
+import unittest.mock as mock
 
 import flask
+import python_dice
 
-import python_dice_website.src.app as app
+import python_dice_website.interface.i_python_dice_interpreter_factory as i_python_dice_interpreter_factory
+import python_dice_website.src.python_dice_web_app_factory as python_dice_web_app_factory
 
 
 class TestRollAPI(unittest.TestCase):
-    def test_add_post(self):
-        response = app.APP.test_client().post(
-            "/roll",
-            data=flask.json.dumps({"program": "1 + 3"}),
-            content_type="application/json",
+    def setUp(self) -> None:
+        self._mock_roll = 12345
+
+        self._mock_python_dice_interpreter = mock.create_autospec(
+            spec=python_dice.PythonDiceInterpreter, spec_set=True
+        )
+        self._mock_python_dice_interpreter.roll.return_value = {
+            "stdout": self._mock_roll
+        }
+        self._mock_python_dice_interpreter_factory = mock.create_autospec(
+            spec=i_python_dice_interpreter_factory.IPythonDiceInterpreterFactory,
+            spec_set=True,
+        )
+        self._mock_python_dice_interpreter_factory.get_interpreter.return_value = (
+            self._mock_python_dice_interpreter
         )
 
-        data = response.get_data(as_text=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(data, "4")
-
-    def test_add_get(self):
-        response = app.APP.test_client().get("/roll?program=2%20%2B%203")
-
-        data = response.get_data(as_text=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(data, "5")
-
-    def test_sub_post(self):
-        response = app.APP.test_client().post(
-            "/roll",
-            data=flask.json.dumps({"program": "ABS(1 - 3)"}),
-            content_type="application/json",
+        self._test_app = (
+            python_dice_web_app_factory.PythonDiceWebAppFactory.create_test_app(
+                interpreter_factory=self._mock_python_dice_interpreter_factory
+            )
+            .get_app()
+            .test_client()
         )
 
-        data = response.get_data(as_text=True)
-
+    def test_post(self):
+        response = self._test_app.post(
+            "/api/roll",
+            data=flask.json.dumps({"program": "1d2 + 3"}),
+            content_type="application/json",
+        )
+        self._mock_python_dice_interpreter_factory.get_interpreter.assert_called_once()
+        self._mock_python_dice_interpreter.roll.assert_called_once_with(["1d2 + 3"])
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data, "2")
+        self.assertEqual(response.get_data(as_text=True), f"{self._mock_roll}\n")
 
-    def test_sub_get(self):
-        response = app.APP.test_client().get("/roll?program=2%20%2D%203")
-
-        data = response.get_data(as_text=True)
-
+    def test_get(self):
+        response = self._test_app.get("/api/roll?program=2%20%2B%203d2")
+        self._mock_python_dice_interpreter_factory.get_interpreter.assert_called_once()
+        self._mock_python_dice_interpreter.roll.assert_called_once_with(["2 + 3d2"])
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data, "-1")
+        self.assertEqual(response.get_data(as_text=True), f"{self._mock_roll}\n")
 
     def test_error_post(self):
-        response = app.APP.test_client().post(
-            "/roll",
+        self._mock_python_dice_interpreter.roll.side_effect = ValueError("mock_error")
+        response = self._test_app.post(
+            "/api/roll",
             data=flask.json.dumps({"program": "ABS(1 - 3d30"}),
             content_type="application/json",
         )
 
-        data = response.get_data(as_text=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            data, "Ran into a $end ($end) where it wasn't expected, at position None."
+        self._mock_python_dice_interpreter_factory.get_interpreter.assert_called_once()
+        self._mock_python_dice_interpreter.roll.assert_called_once_with(
+            ["ABS(1 - 3d30"]
         )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.get_data(as_text=True), '"mock_error"\n')
 
     def test_error_get(self):
-        response = app.APP.test_client().get("/roll?program=ABS%281%20%2D%203d30")
+        self._mock_python_dice_interpreter.roll.side_effect = ValueError("mock_error")
+        response = self._test_app.get("/api/roll?program=ABS%281%20%2D%203d30")
 
-        data = response.get_data(as_text=True)
+        self._mock_python_dice_interpreter_factory.get_interpreter.assert_called_once()
+        self._mock_python_dice_interpreter.roll.assert_called_once_with(
+            ["ABS(1 - 3d30"]
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.get_data(as_text=True), '"mock_error"\n')
 
-        self.assertEqual(response.status_code, 200)
+    def test_post_no_program(self):
+        response = self._test_app.post(
+            "/api/roll", data=flask.json.dumps({}), content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 400)
         self.assertEqual(
-            data, "Ran into a $end ($end) where it wasn't expected, at position None."
+            response.get_data(as_text=True), f'"No program in request json."\n'
         )
 
-    def test_error_two_post(self):
-        response = app.APP.test_client().post(
-            "/roll",
-            data=flask.json.dumps({"program": "3d3d1d0"}),
-            content_type="application/json",
-        )
-
-        data = response.get_data(as_text=True)
-
-        self.assertEqual(response.status_code, 200)
+    def test_get_no_program(self):
+        response = self._test_app.get("/api/roll")
+        self.assertEqual(response.status_code, 400)
         self.assertEqual(
-            data,
-            "Ran into a DICE (d0) where it wasn't expected, at position SourcePosition(idx=5, lineno=1, colno=6).",
-        )
-
-    def test_error_two_get(self):
-        response = app.APP.test_client().get("/roll?program=3d3d1d0")
-
-        data = response.get_data(as_text=True)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            data,
-            "Ran into a DICE (d0) where it wasn't expected, at position SourcePosition(idx=5, lineno=1, colno=6).",
+            response.get_data(as_text=True), f'"No url parameter program."\n'
         )
