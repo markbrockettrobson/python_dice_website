@@ -1,3 +1,4 @@
+import os
 import typing
 
 import python_dice_website.interface.i_pil_image_sender as i_pil_image_sender
@@ -16,7 +17,9 @@ class PythonDiceWebAppFactory:
             python_dice_interpreter_factory=python_dice_interpreter_factory.PythonDiceInterpreterFactory(),
         )
 
-        return python_dice_web_app.PythonDiceWebApp(api_list=api_list)
+        return python_dice_web_app.PythonDiceWebApp(
+            api_list=api_list, https_server=bool(os.environ.get("HTTPS_SERVER", False))
+        )
 
     @staticmethod
     def create_local_app() -> python_dice_web_app.PythonDiceWebApp:
