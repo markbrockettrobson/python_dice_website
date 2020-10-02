@@ -1,133 +1,184 @@
-import io
-import typing
-
 import flask
-import python_dice
+import flask_restplus.api as api
+import flask_restplus.fields as fields
+import flask_restplus.resource as resource
 
 import python_dice_website.interface.i_api_type as i_api_type
+import python_dice_website.interface.i_pil_image_sender as i_pil_image_sender
+import python_dice_website.interface.i_python_dice_interpreter_factory as i_python_dice_interpreter_factory
 import python_dice_website.src.global_logger as global_logger
 
 
 class CompareAtMostApi(i_api_type.IApi):
-    _HELP_NAME = "compare at most"
-    _HElP_TEXT = (
-        "\n"
-        "Creates a probability distribution of two python dice program and returns the image result or passer error\n"
-        "Post request:\n"
-        "   eg {"
-        '       program_one: "2d6 + 2", '
-        '       program_one_name: "hammer",'
-        '       program_two: "2d10 - 2", '
-        '       program_two_name: "bow",'
-        "   }\n"
-        "   note names are optional"
-        "Get request:\n"
-        "   The program to be passed as a URL parameter\n"
-        "   eg ?program_one=2d6%20%2B%202&program_two=2d10%20-%202&program_one_name=hammer&program_two_name=bow\n"
-        '       %20 = " "\n'
-        '       %2B = "+"\n'
-        "   note names are optional"
-    )
-    _ROUTE = "/compareatmost"
+    _ROUTE = "/compare_at_most"
+
+    def __init__(
+        self,
+        python_dice_interpreter_factory: i_python_dice_interpreter_factory.IPythonDiceInterpreterFactory,
+        pil_image_sender: i_pil_image_sender.IPilImageSender,
+    ):
+        self._pil_image_sender = pil_image_sender
+        self._python_dice_interpreter_factory = python_dice_interpreter_factory
 
     # pylint: disable=unused-variable, broad-except
-    @staticmethod
-    def add_to_app(flask_app: flask.Flask) -> None:
+    def add_to_app(self, flask_api: api.Api, name_space: api.Namespace) -> None:
         local_logger = global_logger.ROOT_LOGGER.getChild(CompareAtMostApi.__name__)
 
-        @flask_app.route(CompareAtMostApi._ROUTE, methods=["POST", "GET"])
-        def compare_at_most_api():
-            local_logger.debug("request method %s", flask.request.method)
-            if flask.request.method == "POST":
-                return compare_at_most_api_post()
-            return compare_at_most_api_get()
+        flask_resource_fields = flask_api.model(
+            "compare programs",
+            {
+                "program_one": fields.String(
+                    required=True,
+                    description="The 1st Python Dice program to run",
+                    example="2d20k1",
+                ),
+                "program_two": fields.String(
+                    required=True,
+                    description="The 2nd Python Dice program to run",
+                    example="2d20d1",
+                ),
+                "program_one_name": fields.String(
+                    required=False,
+                    description="The name of the 1st program",
+                    example="1d20 with advantage",
+                ),
+                "program_two_name": fields.String(
+                    required=False,
+                    description="The name of the 2nd program",
+                    example="1d20 with disadvantage",
+                ),
+            },
+        )
 
-        def compare_at_most_api_post():
-            request_json = flask.request.get_json()
-            local_logger.debug("request json %s", request_json)
-            if (
-                request_json
-                and "program_one" in request_json
-                and "program_two" in request_json
-            ):
-                program_one = request_json["program_one"]
-                program_two = request_json["program_two"]
-            else:
-                return f"no json program_one and/or program_two!"
+        flask_resource_parser = flask_api.parser()
+        flask_resource_parser.add_argument(
+            "program_one",
+            type=str,
+            help="The 1st Python Dice program to run",
+            location="args",
+            required=True,
+            ignore=False,
+            nullable=False,
+        )
+        flask_resource_parser.add_argument(
+            "program_two",
+            type=str,
+            help="The 2nd Python Dice program to run",
+            location="args",
+            required=True,
+            ignore=False,
+            nullable=False,
+        )
+        flask_resource_parser.add_argument(
+            "program_one_name",
+            type=str,
+            help="The name of the 1st program",
+            location="args",
+            required=False,
+            ignore=False,
+            nullable=False,
+        )
+        flask_resource_parser.add_argument(
+            "program_two_name",
+            type=str,
+            help="The name of the 2nd program",
+            location="args",
+            required=False,
+            ignore=False,
+            nullable=False,
+        )
 
-            name_one = "Program one"
-            name_two = "Program two"
-            if "program_one_name" in request_json:
-                name_one = request_json["program_one_name"]
-            if "program_one_name" in request_json:
-                name_two = request_json["program_two_name"]
+        pil_image_sender = self._pil_image_sender
+        python_dice_interpreter_factory = self._python_dice_interpreter_factory
 
-            split_program_one = program_one.split("\n")
-            split_program_two = program_two.split("\n")
-            return get_image_send_file(
-                split_program_one, split_program_two, name_one, name_two
-            )
+        # pylint: disable=unused-variable, broad-except
+        @name_space.route(self.route)
+        class CompareAtMost(resource.Resource):
+            @staticmethod
+            @flask_api.expect(flask_resource_fields)
+            def post():
+                request_json = flask.request.get_json()
+                local_logger.debug("request json %s", request_json)
+                if (
+                    request_json
+                    and "program_one" in request_json
+                    and "program_two" in request_json
+                ):
+                    program_one = request_json["program_one"]
+                    program_two = request_json["program_two"]
+                else:
+                    return f"No json program_one and/or program_two.", 400
 
-        def compare_at_most_api_get():
-            program_one = flask.request.args.get("program_one", None)
-            local_logger.debug("program one url arg is %s", program_one)
-            if program_one is None:
-                return f"no url parameter program_one!"
-            program_two = flask.request.args.get("program_two", None)
-            local_logger.debug("program two url arg is %s", program_two)
-            if program_two is None:
-                return f"no url parameter program_two!"
-
-            name_one = flask.request.args.get("program_one_name", None)
-            name_two = flask.request.args.get("program_two_name", None)
-            if name_one is None:
                 name_one = "Program one"
-            if name_two is None:
                 name_two = "Program two"
+                if "program_one_name" in request_json:
+                    name_one = request_json["program_one_name"]
+                if "program_two_name" in request_json:
+                    name_two = request_json["program_two_name"]
 
-            split_program_one = program_one.split("\n")
-            split_program_two = program_two.split("\n")
-            return get_image_send_file(
-                split_program_one, split_program_two, name_one, name_two
-            )
+                split_program_one = program_one.split("\n")
+                split_program_two = program_two.split("\n")
+                interpreter = python_dice_interpreter_factory.get_interpreter()
 
-        def get_image_send_file(
-            split_program_one: typing.List[str],
-            split_program_two: typing.List[str],
-            name_one: str = "Program one",
-            name_two: str = "Program two",
-        ):
-            interpreter = python_dice.PythonDiceInterpreter()
-            try:
-                program_one_distribution = interpreter.get_probability_distributions(
-                    split_program_one
-                )["stdout"]
-                program_two_distribution = interpreter.get_probability_distributions(
-                    split_program_two
-                )["stdout"]
-                image = program_one_distribution.get_compare_at_most(
-                    program_two_distribution, name_one, name_two
-                )
-                file_pointer = io.BytesIO()
-                image.save(file_pointer, format="png")
-                file_pointer.seek(0)
-                return flask.send_file(
-                    file_pointer,
-                    attachment_filename="histogram.png",
-                    as_attachment=False,
-                    add_etags=False,
-                )
-            except Exception as exception:
-                return f"{str(exception)}"
+                try:
+                    program_one_distribution = interpreter.get_probability_distributions(
+                        split_program_one
+                    )[
+                        "stdout"
+                    ]
+                    program_two_distribution = interpreter.get_probability_distributions(
+                        split_program_two
+                    )[
+                        "stdout"
+                    ]
+                    image = program_one_distribution.get_compare_at_most(
+                        program_two_distribution, name_one, name_two
+                    )
+                    return pil_image_sender.send_image(pil_image=image)
+                except Exception as exception:
+                    return f"{str(exception)}", 400
 
-    @staticmethod
-    def get_name() -> str:
-        return CompareAtMostApi._HELP_NAME
+            @staticmethod
+            @flask_api.expect(flask_resource_parser)
+            def get():
+                program_one = flask.request.args.get("program_one", None)
+                local_logger.debug("program one url arg is %s", program_one)
+                if program_one is None:
+                    return f"No url parameter program_one.", 400
+                program_two = flask.request.args.get("program_two", None)
+                local_logger.debug("program two url arg is %s", program_two)
+                if program_two is None:
+                    return f"No url parameter program_two.", 400
 
-    @staticmethod
-    def get_help_text() -> str:
-        return CompareAtMostApi._HElP_TEXT
+                name_one = flask.request.args.get("program_one_name", None)
+                name_two = flask.request.args.get("program_two_name", None)
+                if name_one is None:
+                    name_one = "Program one"
+                if name_two is None:
+                    name_two = "Program two"
 
-    @staticmethod
-    def get_route() -> str:
-        return CompareAtMostApi._ROUTE
+                split_program_one = program_one.split("\n")
+                split_program_two = program_two.split("\n")
+                interpreter = python_dice_interpreter_factory.get_interpreter()
+
+                try:
+                    program_one_distribution = interpreter.get_probability_distributions(
+                        split_program_one
+                    )[
+                        "stdout"
+                    ]
+                    program_two_distribution = interpreter.get_probability_distributions(
+                        split_program_two
+                    )[
+                        "stdout"
+                    ]
+                    image = program_one_distribution.get_compare_at_most(
+                        program_two_distribution, name_one, name_two
+                    )
+                    return pil_image_sender.send_image(pil_image=image)
+                except Exception as exception:
+                    return f"{str(exception)}", 400
+
+    @property
+    def route(self) -> str:
+        return self._ROUTE
