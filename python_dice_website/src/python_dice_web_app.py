@@ -16,6 +16,7 @@ class PythonDiceWebApp:
         debug: bool = False,
         port: int = int(os.environ.get("PORT", 8080)),
         logging: bool = True,
+        https_server: bool = False,
     ):
         self._app = flask.Flask(__name__)
         self._api = flask_restplus.Api(
@@ -43,6 +44,9 @@ class PythonDiceWebApp:
             if logger:
                 logger.info("adding api %s to app.", api.route)
             api.add_to_app(self._api, self._name_space)
+
+        if https_server:
+            self._api.specs_url = flask.url_for("", _external=True, _scheme="https")
 
     def get_app(self) -> flask.Flask:
         return self._app
