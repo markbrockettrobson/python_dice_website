@@ -7,8 +7,6 @@ steps:
   - 'gcr.io/$PROJECT_ID/python_dice_website:$SHORT_SHA'
   - '-f'
   - 'DockerFile.Docker'
-  - '--build-arg'
-  - 'HTTPS_SERVER=True'
   - '.'
 
 - name: 'gcr.io/cloud-builders/docker'
