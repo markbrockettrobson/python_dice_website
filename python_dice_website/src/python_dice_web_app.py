@@ -25,6 +25,7 @@ class PythonDiceWebApp:
             title="Python Dice Rest Api",
             description="""
         a simple Rest API for Python Dice. 
+        for syntax descriptions of python dice see https://github.com/markbrockettrobson/python_dice
         Please let me know if anything is not working. https://github.com/markbrockettrobson/python_dice_website
         If you need any help running this website feel free to ask
         """,

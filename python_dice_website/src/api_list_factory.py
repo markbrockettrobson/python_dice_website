@@ -12,6 +12,8 @@ import python_dice_website.src.api.compare_at_least_api as compare_at_least_api
 import python_dice_website.src.api.compare_at_most_api as compare_at_most_api
 import python_dice_website.src.api.compare_histogram_api as compare_histogram_api
 import python_dice_website.src.api.histogram_api as histogram_api
+import python_dice_website.src.api.max_api as max_api
+import python_dice_website.src.api.min_api as min_api
 import python_dice_website.src.api.privacy_policy_api as privacy_policy_api
 import python_dice_website.src.api.roll_api as roll_api
 import python_dice_website.src.api.slack_roll_api as slack_roll_api
@@ -30,11 +32,13 @@ class ApiListFactory(i_api_list_factory.IApiListFactory):
             average_api.AverageApi(
                 python_dice_interpreter_factory=python_dice_interpreter_factory
             ),
-            histogram_api.HistogramApi(
-                python_dice_interpreter_factory=python_dice_interpreter_factory,
-                pil_image_sender=image_sender,
+            min_api.MinApi(
+                python_dice_interpreter_factory=python_dice_interpreter_factory
             ),
-            compare_api.CompareApi(
+            max_api.MaxApi(
+                python_dice_interpreter_factory=python_dice_interpreter_factory
+            ),
+            histogram_api.HistogramApi(
                 python_dice_interpreter_factory=python_dice_interpreter_factory,
                 pil_image_sender=image_sender,
             ),
@@ -46,7 +50,14 @@ class ApiListFactory(i_api_list_factory.IApiListFactory):
                 python_dice_interpreter_factory=python_dice_interpreter_factory,
                 pil_image_sender=image_sender,
             ),
+            slack_roll_api.SlackRollApi(
+                python_dice_interpreter_factory=python_dice_interpreter_factory
+            ),
             compare_histogram_api.CompareHistogramApi(
+                python_dice_interpreter_factory=python_dice_interpreter_factory,
+                pil_image_sender=image_sender,
+            ),
+            compare_api.CompareApi(
                 python_dice_interpreter_factory=python_dice_interpreter_factory,
                 pil_image_sender=image_sender,
             ),
@@ -59,7 +70,4 @@ class ApiListFactory(i_api_list_factory.IApiListFactory):
                 pil_image_sender=image_sender,
             ),
             privacy_policy_api.PrivacyApi(),
-            slack_roll_api.SlackRollApi(
-                python_dice_interpreter_factory=python_dice_interpreter_factory
-            ),
         ]
