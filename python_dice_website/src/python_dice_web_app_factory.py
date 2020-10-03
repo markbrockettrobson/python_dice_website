@@ -1,5 +1,7 @@
 import typing
 
+import werkzeug.contrib.fixers as fixers
+
 import python_dice_website.interface.i_pil_image_sender as i_pil_image_sender
 import python_dice_website.interface.i_python_dice_interpreter_factory as i_python_dice_interpreter_factory
 import python_dice_website.src.api.helpers.pil_image_sender as pil_image_sender
@@ -16,7 +18,9 @@ class PythonDiceWebAppFactory:
             python_dice_interpreter_factory=python_dice_interpreter_factory.PythonDiceInterpreterFactory(),
         )
 
-        return python_dice_web_app.PythonDiceWebApp(api_list=api_list)
+        app = python_dice_web_app.PythonDiceWebApp(api_list=api_list)
+        app.get_app().wsgi_app = fixers.ProxyFix(app.get_app().wsgi_app)
+        return app
 
     @staticmethod
     def create_local_app() -> python_dice_web_app.PythonDiceWebApp:
