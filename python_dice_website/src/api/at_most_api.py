@@ -17,7 +17,7 @@ class AtMostApi(i_api_type.IApi):
         self,
         python_dice_interpreter_factory: i_python_dice_interpreter_factory.IPythonDiceInterpreterFactory,
         pil_image_sender: i_pil_image_sender.IPilImageSender,
-        usage_limiter: i_usage_limiter.IUsageLimiter
+        usage_limiter: i_usage_limiter.IUsageLimiter,
     ):
         self._pil_image_sender = pil_image_sender
         self._python_dice_interpreter_factory = python_dice_interpreter_factory

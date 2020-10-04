@@ -13,6 +13,6 @@ class IApiListFactory(abc.ABC):
     def build_api_list(
         image_sender: i_pil_image_sender.IPilImageSender,
         python_dice_interpreter_factory: i_python_dice_interpreter_factory.IPythonDiceInterpreterFactory,
-        usage_limiter: i_usage_limiter.IUsageLimiter
+        usage_limiter: i_usage_limiter.IUsageLimiter,
     ) -> typing.List[i_api_type.IApi]:
         pass

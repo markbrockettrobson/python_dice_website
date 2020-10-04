@@ -28,8 +28,7 @@ class TestAverageAPI(unittest.TestCase):
         )
 
         self._mock_usage_limiter = mock.create_autospec(
-            spec=i_usage_limiter.IUsageLimiter,
-            spec_set=True
+            spec=i_usage_limiter.IUsageLimiter, spec_set=True
         )
         self._mock_usage_limiter.is_over_limit.return_value = False
         self._mock_usage_limiter.get_over_limit_message.return_value = "mock message"
@@ -68,9 +67,7 @@ class TestAverageAPI(unittest.TestCase):
         self._mock_usage_limiter.is_over_limit.assert_called_once_with(["2 + 3d2"])
 
     def test_error_post(self):
-        self._mock_usage_limiter.is_over_limit.side_effect = ValueError(
-            "mock_error"
-        )
+        self._mock_usage_limiter.is_over_limit.side_effect = ValueError("mock_error")
         response = self._test_app.post(
             "/api/average",
             data=flask.json.dumps({"program": "ABS(1 - 3d30"}),
@@ -83,9 +80,7 @@ class TestAverageAPI(unittest.TestCase):
         self.assertEqual(response.get_data(as_text=True), '"mock_error"\n')
 
     def test_error_get(self):
-        self._mock_usage_limiter.is_over_limit.side_effect = ValueError(
-            "mock_error"
-        )
+        self._mock_usage_limiter.is_over_limit.side_effect = ValueError("mock_error")
         response = self._test_app.get("/api/average?program=ABS%281%20%2D%203d30")
 
         self._mock_usage_limiter.is_over_limit.assert_called_once_with(["ABS(1 - 3d30"])
@@ -117,9 +112,7 @@ class TestAverageAPI(unittest.TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.get_data(as_text=True), f'"mock message"\n'
-        )
+        self.assertEqual(response.get_data(as_text=True), f'"mock message"\n')
         self._mock_usage_limiter.is_over_limit.assert_called_once_with(["1d2 + 3"])
         self._mock_usage_limiter.get_over_limit_message.assert_called_once()
 
@@ -127,8 +120,6 @@ class TestAverageAPI(unittest.TestCase):
         self._mock_usage_limiter.is_over_limit.return_value = True
         response = self._test_app.get("/api/average?program=2%20%2B%203d2")
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.get_data(as_text=True), f'"mock message"\n'
-        )
+        self.assertEqual(response.get_data(as_text=True), f'"mock message"\n')
         self._mock_usage_limiter.is_over_limit.assert_called_once_with(["2 + 3d2"])
         self._mock_usage_limiter.get_over_limit_message.assert_called_once()

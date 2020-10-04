@@ -15,7 +15,7 @@ class AverageApi(i_api_type.IApi):
     def __init__(
         self,
         python_dice_interpreter_factory: i_python_dice_interpreter_factory.IPythonDiceInterpreterFactory,
-        usage_limiter: i_usage_limiter.IUsageLimiter
+        usage_limiter: i_usage_limiter.IUsageLimiter,
     ):
         self._python_dice_interpreter_factory = python_dice_interpreter_factory
         self._usage_limiter = usage_limiter

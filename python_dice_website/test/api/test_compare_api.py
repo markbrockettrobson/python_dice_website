@@ -41,8 +41,7 @@ class TestCompareAPI(unittest.TestCase):
         )
 
         self._mock_usage_limiter = mock.create_autospec(
-            spec=i_usage_limiter.IUsageLimiter,
-            spec_set=True
+            spec=i_usage_limiter.IUsageLimiter, spec_set=True
         )
         self._mock_usage_limiter.is_over_limit.return_value = False
         self._mock_usage_limiter.get_over_limit_message.return_value = "mock message"
@@ -84,8 +83,8 @@ class TestCompareAPI(unittest.TestCase):
         self.assertEqual(
             response.get_data(as_text=True), f'"{self._mock_image_sender_return}"\n'
         )
-        self._mock_usage_limiter.is_over_limit.assert_has_calls([
-            mock.call(["10d6"]), mock.call(["6d8 + 3"])]
+        self._mock_usage_limiter.is_over_limit.assert_has_calls(
+            [mock.call(["10d6"]), mock.call(["6d8 + 3"])]
         )
 
     def test_post_no_names(self):
@@ -108,8 +107,8 @@ class TestCompareAPI(unittest.TestCase):
         self.assertEqual(
             response.get_data(as_text=True), f'"{self._mock_image_sender_return}"\n'
         )
-        self._mock_usage_limiter.is_over_limit.assert_has_calls([
-            mock.call(["10d6"]), mock.call(["6d8 + 3"])]
+        self._mock_usage_limiter.is_over_limit.assert_has_calls(
+            [mock.call(["10d6"]), mock.call(["6d8 + 3"])]
         )
 
     def test_post_no_name_one(self):
@@ -138,8 +137,8 @@ class TestCompareAPI(unittest.TestCase):
         self.assertEqual(
             response.get_data(as_text=True), f'"{self._mock_image_sender_return}"\n'
         )
-        self._mock_usage_limiter.is_over_limit.assert_has_calls([
-            mock.call(["10d6"]), mock.call(["6d8 + 3"])]
+        self._mock_usage_limiter.is_over_limit.assert_has_calls(
+            [mock.call(["10d6"]), mock.call(["6d8 + 3"])]
         )
 
     def test_post_no_name_two(self):
@@ -168,8 +167,8 @@ class TestCompareAPI(unittest.TestCase):
         self.assertEqual(
             response.get_data(as_text=True), f'"{self._mock_image_sender_return}"\n'
         )
-        self._mock_usage_limiter.is_over_limit.assert_has_calls([
-            mock.call(["10d6"]), mock.call(["6d8 + 3"])]
+        self._mock_usage_limiter.is_over_limit.assert_has_calls(
+            [mock.call(["10d6"]), mock.call(["6d8 + 3"])]
         )
 
     def test_get(self):
@@ -190,8 +189,8 @@ class TestCompareAPI(unittest.TestCase):
         self.assertEqual(
             response.get_data(as_text=True), f'"{self._mock_image_sender_return}"\n'
         )
-        self._mock_usage_limiter.is_over_limit.assert_has_calls([
-            mock.call(["2d6"]), mock.call(["3d4"])]
+        self._mock_usage_limiter.is_over_limit.assert_has_calls(
+            [mock.call(["2d6"]), mock.call(["3d4"])]
         )
 
     def test_get_no_names(self):
@@ -210,8 +209,8 @@ class TestCompareAPI(unittest.TestCase):
         self.assertEqual(
             response.get_data(as_text=True), f'"{self._mock_image_sender_return}"\n'
         )
-        self._mock_usage_limiter.is_over_limit.assert_has_calls([
-            mock.call(["2d6"]), mock.call(["3d4"])]
+        self._mock_usage_limiter.is_over_limit.assert_has_calls(
+            [mock.call(["2d6"]), mock.call(["3d4"])]
         )
 
     def test_get_no_name_one(self):
@@ -232,8 +231,8 @@ class TestCompareAPI(unittest.TestCase):
         self.assertEqual(
             response.get_data(as_text=True), f'"{self._mock_image_sender_return}"\n'
         )
-        self._mock_usage_limiter.is_over_limit.assert_has_calls([
-            mock.call(["2d6"]), mock.call(["3d4"])]
+        self._mock_usage_limiter.is_over_limit.assert_has_calls(
+            [mock.call(["2d6"]), mock.call(["3d4"])]
         )
 
     def test_get_name_two(self):
@@ -254,14 +253,12 @@ class TestCompareAPI(unittest.TestCase):
         self.assertEqual(
             response.get_data(as_text=True), f'"{self._mock_image_sender_return}"\n'
         )
-        self._mock_usage_limiter.is_over_limit.assert_has_calls([
-            mock.call(["2d6"]), mock.call(["3d4"])]
+        self._mock_usage_limiter.is_over_limit.assert_has_calls(
+            [mock.call(["2d6"]), mock.call(["3d4"])]
         )
 
     def test_error_post(self):
-        self._mock_usage_limiter.is_over_limit.side_effect = ValueError(
-            "mock_error"
-        )
+        self._mock_usage_limiter.is_over_limit.side_effect = ValueError("mock_error")
         response = self._test_app.post(
             "/api/compare",
             data=flask.json.dumps(
@@ -280,9 +277,7 @@ class TestCompareAPI(unittest.TestCase):
         self.assertEqual(response.get_data(as_text=True), f'"mock_error"\n')
 
     def test_error_get(self):
-        self._mock_usage_limiter.is_over_limit.side_effect = ValueError(
-            "mock_error"
-        )
+        self._mock_usage_limiter.is_over_limit.side_effect = ValueError("mock_error")
         response = self._test_app.get(
             "/api/compare?program_one=2d6&program_two=3d4&program_one_name=Name%20one&program_two_name=Name%20two"
         )
@@ -361,9 +356,7 @@ class TestCompareAPI(unittest.TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.get_data(as_text=True), f'"mock message"\n'
-        )
+        self.assertEqual(response.get_data(as_text=True), f'"mock message"\n')
         self._mock_usage_limiter.is_over_limit.assert_called_once_with(["10d6"])
         self._mock_usage_limiter.get_over_limit_message.assert_called_once()
 
@@ -373,8 +366,6 @@ class TestCompareAPI(unittest.TestCase):
             "/api/compare?program_one=2d6&program_two=3d4&program_one_name=Name%20one&program_two_name=Name%20two"
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.get_data(as_text=True), f'"mock message"\n'
-        )
+        self.assertEqual(response.get_data(as_text=True), f'"mock message"\n')
         self._mock_usage_limiter.is_over_limit.assert_called_once_with(["2d6"])
         self._mock_usage_limiter.get_over_limit_message.assert_called_once()
