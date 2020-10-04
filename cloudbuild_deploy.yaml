@@ -6,6 +6,8 @@ steps:
   - '-t'
   - 'gcr.io/$PROJECT_ID/python_dice_website:$SHORT_SHA'
   - '-f'
+  - '--env'
+  - 'ENV_USAGE_LIMITER_MAX_COST=10000'
   - 'DockerFile.Docker'
   - '.'
 
@@ -27,5 +29,3 @@ steps:
     - 'us-central1'
     - '--platform'
     - 'managed'
-    - '--env'
-    - 'ENV_USAGE_LIMITER_MAX_COST=10000'
