@@ -27,3 +27,5 @@ steps:
     - 'us-central1'
     - '--platform'
     - 'managed'
+    - '--env'
+    - 'ENV_USAGE_LIMITER_MAX_COST=10000'

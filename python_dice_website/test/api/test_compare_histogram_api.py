@@ -7,6 +7,7 @@ import python_dice
 
 import python_dice_website.interface.i_pil_image_sender as i_pil_image_sender
 import python_dice_website.interface.i_python_dice_interpreter_factory as i_python_dice_interpreter_factory
+import python_dice_website.interface.i_usage_limiter as i_usage_limiter
 import python_dice_website.src.python_dice_web_app_factory as python_dice_web_app_factory
 
 
@@ -41,10 +42,18 @@ class TestCompareHistogramAPI(unittest.TestCase):
             self._mock_image_sender_return
         )
 
+        self._mock_usage_limiter = mock.create_autospec(
+            spec=i_usage_limiter.IUsageLimiter,
+            spec_set=True
+        )
+        self._mock_usage_limiter.is_over_limit.return_value = False
+        self._mock_usage_limiter.get_over_limit_message.return_value = "mock message"
+
         self._test_app = (
             python_dice_web_app_factory.PythonDiceWebAppFactory.create_test_app(
                 image_sender=self._mock_pil_image_sender,
                 interpreter_factory=self._mock_python_dice_interpreter_factory,
+                limiter=self._mock_usage_limiter,
             )
             .get_app()
             .test_client()
@@ -70,6 +79,9 @@ class TestCompareHistogramAPI(unittest.TestCase):
         self.assertEqual(
             response.get_data(as_text=True), f'"{self._mock_image_sender_return}"\n'
         )
+        self._mock_usage_limiter.is_over_limit.assert_has_calls([
+            mock.call(["10d6"]), mock.call(["6d8 + 3"])]
+        )
 
     def test_get(self):
         response = self._test_app.get(
@@ -89,9 +101,12 @@ class TestCompareHistogramAPI(unittest.TestCase):
         self.assertEqual(
             response.get_data(as_text=True), f'"{self._mock_image_sender_return}"\n'
         )
+        self._mock_usage_limiter.is_over_limit.assert_has_calls([
+            mock.call(["2d6"]), mock.call(["3d4"])]
+        )
 
     def test_error_post(self):
-        self._mock_python_dice_interpreter.get_probability_distributions.side_effect = ValueError(
+        self._mock_usage_limiter.is_over_limit.side_effect = ValueError(
             "mock_error"
         )
         response = self._test_app.post(
@@ -106,19 +121,21 @@ class TestCompareHistogramAPI(unittest.TestCase):
             ),
             content_type="application/json",
         )
-        self._mock_python_dice_interpreter_factory.get_interpreter.assert_called_once()
+
+        self._mock_usage_limiter.is_over_limit.assert_called_once_with(["10d6"])
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.get_data(as_text=True), f'"mock_error"\n')
 
     def test_error_get(self):
-        self._mock_python_dice_interpreter.get_probability_distributions.side_effect = ValueError(
+        self._mock_usage_limiter.is_over_limit.side_effect = ValueError(
             "mock_error"
         )
         response = self._test_app.get(
             "/api/compare_histogram?program_one=2d6&program_two=3d4"
             "&program_one_name=Name%20one&program_two_name=Name%20two"
         )
-        self._mock_python_dice_interpreter_factory.get_interpreter.assert_called_once()
+
+        self._mock_usage_limiter.is_over_limit.assert_called_once_with(["2d6"])
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.get_data(as_text=True), f'"mock_error"\n')
 
@@ -178,3 +195,29 @@ class TestCompareHistogramAPI(unittest.TestCase):
         self.assertEqual(
             response.get_data(as_text=True), f'"No url parameter program_two."\n'
         )
+
+    def test_post_over_limit(self):
+        self._mock_usage_limiter.is_over_limit.return_value = True
+        response = self._test_app.post(
+            "/api/compare_histogram",
+            data=flask.json.dumps({"program_one": "10d6", "program_two": "6d8 + 3"}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.get_data(as_text=True), f'"mock message"\n'
+        )
+        self._mock_usage_limiter.is_over_limit.assert_called_once_with(["10d6"])
+        self._mock_usage_limiter.get_over_limit_message.assert_called_once()
+
+    def test_get_over_limit(self):
+        self._mock_usage_limiter.is_over_limit.return_value = True
+        response = self._test_app.get(
+            "/api/compare_histogram?program_one=2d6&program_two=3d4"
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.get_data(as_text=True), f'"mock message"\n'
+        )
+        self._mock_usage_limiter.is_over_limit.assert_called_once_with(["2d6"])
+        self._mock_usage_limiter.get_over_limit_message.assert_called_once()
