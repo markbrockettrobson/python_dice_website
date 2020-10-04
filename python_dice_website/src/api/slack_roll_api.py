@@ -4,6 +4,7 @@ import flask_restplus.resource as resource
 
 import python_dice_website.interface.i_api_type as i_api_type
 import python_dice_website.interface.i_python_dice_interpreter_factory as i_python_dice_interpreter_factory
+import python_dice_website.interface.i_usage_limiter as i_usage_limiter
 import python_dice_website.src.global_logger as global_logger
 
 
@@ -13,8 +14,10 @@ class SlackRollApi(i_api_type.IApi):
     def __init__(
         self,
         python_dice_interpreter_factory: i_python_dice_interpreter_factory.IPythonDiceInterpreterFactory,
+        usage_limiter: i_usage_limiter.IUsageLimiter,
     ):
         self._python_dice_interpreter_factory = python_dice_interpreter_factory
+        self._usage_limiter = usage_limiter
 
     # pylint: disable=unused-variable, broad-except
     def add_to_app(self, flask_api: api.Api, name_space: api.Namespace) -> None:
@@ -33,6 +36,7 @@ class SlackRollApi(i_api_type.IApi):
             nullable=False,
         )
         python_dice_interpreter_factory = self._python_dice_interpreter_factory
+        usage_limiter = self._usage_limiter
 
         # pylint: disable=unused-variable, broad-except
         @name_space.route(self.route)
@@ -51,6 +55,8 @@ class SlackRollApi(i_api_type.IApi):
                     return flask.jsonify(payload)
                 split_program = program.split("\n")
                 try:
+                    if usage_limiter.is_over_limit(split_program):
+                        return usage_limiter.get_over_limit_message(), 400
                     payload = {
                         "response_type": "in_channel",
                         "blocks": [
