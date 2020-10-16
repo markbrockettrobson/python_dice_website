@@ -2,6 +2,7 @@ import typing
 
 import python_dice_website.interface.i_python_dice_interpreter_factory as i_python_dice_interpreter_factory
 import python_dice_website.interface.i_usage_limiter as i_usage_limiter
+import python_dice_website.src.global_logger as global_logger
 
 
 class UsageLimiter(i_usage_limiter.IUsageLimiter):
@@ -10,6 +11,7 @@ class UsageLimiter(i_usage_limiter.IUsageLimiter):
         max_cost: int,
         interpreter_factory: i_python_dice_interpreter_factory.IPythonDiceInterpreterFactory,
     ):
+        self._logger = global_logger.ROOT_LOGGER.getChild(UsageLimiter.__name__)
         self._interpreter_factory = interpreter_factory
         self._max_cost = max_cost
 
@@ -17,7 +19,7 @@ class UsageLimiter(i_usage_limiter.IUsageLimiter):
         cost = self._interpreter_factory.get_interpreter().get_estimated_cost(
             python_dice_program
         )
-        print(self._max_cost, cost, self._max_cost <= cost)
+        self._logger.info(f"Cost estimate is {cost} of {self._max_cost}.")
         return self._max_cost < cost
 
     @staticmethod
