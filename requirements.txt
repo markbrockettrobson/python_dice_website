@@ -1,4 +1,4 @@
-codecov==2.0.15
+codecov==2.0.16
 pylint==2.3.1
 pytest==5.0.1
 pytest-black==0.3.7
