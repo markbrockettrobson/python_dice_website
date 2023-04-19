@@ -93,16 +93,16 @@ class CompareHistogramApi(i_api_type.IApi):
                         return usage_limiter.get_over_limit_message(), 400
                     if usage_limiter.is_over_limit(split_program_two):
                         return usage_limiter.get_over_limit_message(), 400
-                    program_one_distribution = interpreter.get_probability_distributions(
-                        split_program_one
-                    )[
-                        "stdout"
-                    ]
-                    program_two_distribution = interpreter.get_probability_distributions(
-                        split_program_two
-                    )[
-                        "stdout"
-                    ]
+                    program_one_distribution = (
+                        interpreter.get_probability_distributions(split_program_one)[
+                            "stdout"
+                        ]
+                    )
+                    program_two_distribution = (
+                        interpreter.get_probability_distributions(split_program_two)[
+                            "stdout"
+                        ]
+                    )
                     image = program_one_distribution.get_compare_histogram(
                         program_two_distribution
                     )
@@ -131,16 +131,16 @@ class CompareHistogramApi(i_api_type.IApi):
                         return usage_limiter.get_over_limit_message(), 400
                     if usage_limiter.is_over_limit(split_program_two):
                         return usage_limiter.get_over_limit_message(), 400
-                    program_one_distribution = interpreter.get_probability_distributions(
-                        split_program_one
-                    )[
-                        "stdout"
-                    ]
-                    program_two_distribution = interpreter.get_probability_distributions(
-                        split_program_two
-                    )[
-                        "stdout"
-                    ]
+                    program_one_distribution = (
+                        interpreter.get_probability_distributions(split_program_one)[
+                            "stdout"
+                        ]
+                    )
+                    program_two_distribution = (
+                        interpreter.get_probability_distributions(split_program_two)[
+                            "stdout"
+                        ]
+                    )
                     image = program_one_distribution.get_compare_histogram(
                         program_two_distribution
                     )
