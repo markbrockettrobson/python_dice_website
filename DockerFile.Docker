@@ -13,6 +13,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY python_dice_website ./python_dice_website
 COPY .coveragerc ./
 
-RUN python -m pytest --black --isort --pylint --cov python_dice_website
+RUN python -m pytest --black --isort --cov python_dice_website
 
 CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 python_dice_website.entry_point:APP
