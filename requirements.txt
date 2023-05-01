@@ -7,7 +7,7 @@ pytest-isort
 pytest-mypy
 pytest-pylint
 jinja2<3.1.0
-flask==1.1.1
+flask==2.3.2
 flask-restplus==0.13.0
 gunicorn==19.9.0
 python_dice
